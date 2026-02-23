@@ -1,9 +1,10 @@
 import type { Restaurant, RestaurantFormValues } from "../models/restaurant";
 import { STORAGE_KEYS } from "./storageKeys";
+import { createId } from "../utils/createId";
 
 const seedRestaurants: Restaurant[] = [
   {
-    id: crypto.randomUUID(),
+    id: createId(),
     name: "Burger Studio",
     category: "Burger",
     address: "12 Main Street",
@@ -12,14 +13,14 @@ const seedRestaurants: Restaurant[] = [
       "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80",
     review: { score: 4.7, count: 294 },
     deals: [
-      { id: crypto.randomUUID(), title: "1+1 Classic Burger", description: "Buy one classic burger and get one free." },
-      { id: crypto.randomUUID(), title: "Free Fries", description: "Free fries with any double burger order." },
+      { id: createId(), title: "1+1 Classic Burger", description: "Buy one classic burger and get one free." },
+      { id: createId(), title: "Free Fries", description: "Free fries with any double burger order." },
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
-    id: crypto.randomUUID(),
+    id: createId(),
     name: "Pizza Corner",
     category: "Pizza",
     address: "49 Lake Avenue",
@@ -28,7 +29,7 @@ const seedRestaurants: Restaurant[] = [
       "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
     review: { score: 4.5, count: 182 },
     deals: [
-      { id: crypto.randomUUID(), title: "1+1 Margherita", description: "Order one medium margherita and get one free." },
+      { id: createId(), title: "1+1 Margherita", description: "Order one medium margherita and get one free." },
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -70,7 +71,7 @@ const mapFormToRestaurant = (values: RestaurantFormValues): Omit<Restaurant, "id
     .map((line) => line.trim())
     .filter(Boolean)
     .map((title) => ({
-      id: crypto.randomUUID(),
+      id: createId(),
       title,
       description: title,
     })),
@@ -91,7 +92,7 @@ export const restaurantService = {
     const now = new Date().toISOString();
 
     const newRestaurant: Restaurant = {
-      id: crypto.randomUUID(),
+      id: createId(),
       ...mapFormToRestaurant(values),
       createdAt: now,
       updatedAt: now,

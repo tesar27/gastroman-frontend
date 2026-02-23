@@ -1,5 +1,6 @@
 import type { AdminUser, SignInPayload, SignUpPayload } from "../models/auth";
 import { STORAGE_KEYS } from "./storageKeys";
+import { createId } from "../utils/createId";
 
 interface StoredAdmin extends AdminUser {
   password: string;
@@ -44,7 +45,7 @@ export const authService = {
     }
 
     const fallbackUser: StoredAdmin = {
-      id: crypto.randomUUID(),
+      id: createId(),
       name: payload.email.split("@")[0] || "Admin",
       email: payload.email,
       password: payload.password,
@@ -69,7 +70,7 @@ export const authService = {
     }
 
     const newUser: StoredAdmin = {
-      id: crypto.randomUUID(),
+      id: createId(),
       name: payload.name,
       email: payload.email,
       password: payload.password,
