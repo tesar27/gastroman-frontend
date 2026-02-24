@@ -27,7 +27,7 @@ const AdminAuthPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-950 px-4 py-10 text-slate-100">
+    <div className="relative min-h-screen overflow-hidden bg-slate-950 px-4 py-10 text-slate-100 flex items-center justify-center">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.25),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(56,189,248,0.18),transparent_35%)]" />
 
       <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur">

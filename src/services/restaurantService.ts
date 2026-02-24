@@ -2,6 +2,52 @@ import type { Restaurant, RestaurantFormValues } from "../models/restaurant";
 import { STORAGE_KEYS } from "./storageKeys";
 import { createId } from "../utils/createId";
 
+export const categoryMockImages: Record<string, string[]> = {
+  burger: [
+    "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80",
+  ],
+  pizza: [
+    "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1594007654729-407eedc4be65?auto=format&fit=crop&w=1200&q=80",
+  ],
+  coffee: [
+    "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
+  ],
+  sushi: [
+    "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80",
+  ],
+  asian: [
+    "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1200&q=80",
+  ],
+  doner: [
+    "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=1200&q=80",
+  ],
+  restaurant: [
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80",
+  ],
+  default: [
+    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1200&q=80",
+  ],
+};
+
+const getMockImageForRestaurant = (category: string, restaurantName: string): string => {
+  const normalizedCategory = category.trim().toLowerCase();
+  const categoryImages = categoryMockImages[normalizedCategory] ?? categoryMockImages.default;
+
+  const source = restaurantName || category || "restaurant";
+  const hash = Array.from(source).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const index = hash % categoryImages.length;
+
+  return categoryImages[index];
+};
+
 type SeedRestaurantInput = {
   name: string;
   category: string;
@@ -298,7 +344,9 @@ const mapFormToRestaurant = (values: RestaurantFormValues): Omit<Restaurant, "id
   category: values.category,
   address: values.address,
   openingTime: values.openingTime,
-  mainImageUrl: values.mainImageUrl,
+  mainImageUrl:
+    values.mainImageUrl.trim() ||
+    getMockImageForRestaurant(values.category, values.name),
   review: {
     score: values.reviewScore,
     count: values.reviewCount,

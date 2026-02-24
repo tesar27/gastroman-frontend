@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import type { FormEvent } from "react";
 
 const heroImage =
   "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80";
@@ -57,14 +59,82 @@ const plans = [
   },
 ];
 
+// Sign up at https://formspree.io, create a form, and paste your form ID here.
+// Your submissions will be forwarded to the email you registered with.
+const FORMSPREE_ID = ""; // e.g. "xpwzknjv"
+
+type ApplicationForm = {
+  businessName: string;
+  category: string;
+  ownerName: string;
+  email: string;
+  phone: string;
+  city: string;
+  message: string;
+};
+
+const EMPTY_APPLICATION: ApplicationForm = {
+  businessName: "",
+  category: "",
+  ownerName: "",
+  email: "",
+  phone: "",
+  city: "",
+  message: "",
+};
+
 const LandingPage = () => {
+  const [application, setApplication] = useState<ApplicationForm>(EMPTY_APPLICATION);
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  const updateField = <K extends keyof ApplicationForm>(key: K, value: string) => {
+    setApplication((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleApply = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setStatus("sending");
+
+    if (!FORMSPREE_ID) {
+      // No Formspree ID configured — simulate success for demo purposes
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      setStatus("success");
+      setApplication(EMPTY_APPLICATION);
+      return;
+    }
+
+    try {
+      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          "Business Name": application.businessName,
+          Category: application.category,
+          "Owner Name": application.ownerName,
+          Email: application.email,
+          Phone: application.phone || "—",
+          City: application.city,
+          Message: application.message || "—",
+        }),
+      });
+      if (res.ok) {
+        setStatus("success");
+        setApplication(EMPTY_APPLICATION);
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2 text-lg font-semibold">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 text-white">
-              N
+              G
             </span>
             Gastroman
           </div>
@@ -81,6 +151,12 @@ const LandingPage = () => {
               className="hidden text-sm text-slate-300 hover:text-white md:inline-block"
             >
               Gallery
+            </a>
+            <a
+              href="#apply"
+              className="hidden text-sm text-slate-300 hover:text-white md:inline-block"
+            >
+              Become a Partner
             </a>
             <Link
               to="/admin/auth"
@@ -107,13 +183,11 @@ const LandingPage = () => {
                 Restaurant Management Platform
               </p>
               <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-6xl">
-                Run your entire food partner network from one beautiful admin
-                panel.
+                Run the online presence of your venue
               </h1>
               <p className="text-lg text-slate-300">
-                Manage burger spots, pizza places, doner shops, coffee bars and
-                restaurants with fast onboarding, easy offer control and better
-                quality data for your customer mobile app.
+                Manage your venue listings, deals, reviews and performance in
+                one place and focus on growing your network and sales.
               </p>
 
               <div className="flex flex-wrap gap-3">
@@ -245,6 +319,160 @@ const LandingPage = () => {
                 </ul>
               </article>
             ))}
+          </div>
+        </section>
+
+        {/* Partner Application Form */}
+        <section id="apply" className="mx-auto w-full max-w-7xl px-6 py-20">
+          <div className="mx-auto max-w-2xl">
+            <div className="mb-8 text-center">
+              <p className="inline-flex rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-sm text-emerald-300">
+                Become a Partner
+              </p>
+              <h2 className="mt-4 text-3xl font-bold md:text-4xl">
+                Apply to join our network
+              </h2>
+              <p className="mt-3 text-slate-300">
+                Burger bars, pizza places, coffee shops, doner joints — if you
+                serve great food, we want you on the platform.
+              </p>
+            </div>
+
+            {status === "success" ? (
+              <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-10 text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20 text-2xl">
+                  ✓
+                </div>
+                <h3 className="text-xl font-semibold text-white">Application sent!</h3>
+                <p className="mt-2 text-slate-300">
+                  Thanks for applying. We'll be in touch within 1–2 business days.
+                </p>
+                <button
+                  onClick={() => setStatus("idle")}
+                  className="mt-6 rounded-lg border border-white/10 bg-white/5 px-5 py-2 text-sm text-white/80 hover:bg-white/10"
+                >
+                  Submit another
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleApply}
+                className="space-y-5 rounded-2xl border border-white/10 bg-white/5 p-8"
+              >
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="space-y-1 text-sm text-white/80">
+                    <span className="font-medium">Business Name</span>
+                    <input
+                      value={application.businessName}
+                      onChange={(e) => updateField("businessName", e.target.value)}
+                      placeholder="e.g. Joe's Burger Shack"
+                      required
+                      className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-emerald-400"
+                    />
+                  </label>
+
+                  <label className="space-y-1 text-sm text-white/80">
+                    <span className="font-medium">Category</span>
+                    <select
+                      value={application.category}
+                      onChange={(e) => updateField("category", e.target.value)}
+                      required
+                      className="w-full rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-emerald-400"
+                    >
+                      <option value="" disabled>Select category…</option>
+                      <option>Burger</option>
+                      <option>Pizza</option>
+                      <option>Coffee</option>
+                      <option>Sushi</option>
+                      <option>Doner</option>
+                      <option>Asian</option>
+                      <option>Restaurant</option>
+                      <option>Other</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="space-y-1 text-sm text-white/80">
+                    <span className="font-medium">Your Name</span>
+                    <input
+                      value={application.ownerName}
+                      onChange={(e) => updateField("ownerName", e.target.value)}
+                      placeholder="Owner / Manager"
+                      required
+                      className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-emerald-400"
+                    />
+                  </label>
+
+                  <label className="space-y-1 text-sm text-white/80">
+                    <span className="font-medium">Email</span>
+                    <input
+                      type="email"
+                      value={application.email}
+                      onChange={(e) => updateField("email", e.target.value)}
+                      placeholder="you@example.com"
+                      required
+                      className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-emerald-400"
+                    />
+                  </label>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="space-y-1 text-sm text-white/80">
+                    <span className="font-medium">
+                      Phone{" "}
+                      <span className="text-white/40 font-normal">(optional)</span>
+                    </span>
+                    <input
+                      type="tel"
+                      value={application.phone}
+                      onChange={(e) => updateField("phone", e.target.value)}
+                      placeholder="+49 …"
+                      className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-emerald-400"
+                    />
+                  </label>
+
+                  <label className="space-y-1 text-sm text-white/80">
+                    <span className="font-medium">City</span>
+                    <input
+                      value={application.city}
+                      onChange={(e) => updateField("city", e.target.value)}
+                      placeholder="Berlin, Munich, Hamburg…"
+                      required
+                      className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-emerald-400"
+                    />
+                  </label>
+                </div>
+
+                <label className="block space-y-1 text-sm text-white/80">
+                  <span className="font-medium">
+                    Anything else?{" "}
+                    <span className="text-white/40 font-normal">(optional)</span>
+                  </span>
+                  <textarea
+                    value={application.message}
+                    onChange={(e) => updateField("message", e.target.value)}
+                    rows={3}
+                    placeholder="Tell us about your venue, number of locations, current deals…"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/30 outline-none focus:border-emerald-400"
+                  />
+                </label>
+
+                {status === "error" && (
+                  <p className="text-sm text-red-400">
+                    Something went wrong. Please try again or email us directly.
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={status === "sending"}
+                  className="w-full rounded-lg bg-emerald-500 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-60"
+                >
+                  {status === "sending" ? "Sending…" : "Apply to Partner"}
+                </button>
+              </form>
+            )}
           </div>
         </section>
 

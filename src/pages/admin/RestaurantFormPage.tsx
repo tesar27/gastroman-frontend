@@ -19,10 +19,13 @@ const RestaurantFormPage = () => {
     <section className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <p className="text-xs uppercase tracking-[0.2em] text-emerald-300/90">
+            {isEdit ? "Edit Partner" : "New Partner"}
+          </p>
+          <h1 className="text-2xl font-bold text-white">
             {isEdit ? "Edit Restaurant" : "Add Restaurant"}
           </h1>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-300">
             {isEdit
               ? "Update partner details and offers visible in your mobile app."
               : "Create a new partner restaurant with image, deals, opening time and reviews."}
@@ -31,7 +34,7 @@ const RestaurantFormPage = () => {
 
         <Link
           to="/admin/restaurants"
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 hover:bg-white/10"
         >
           Back to list
         </Link>
